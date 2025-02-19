@@ -12,7 +12,7 @@ for SIZE in SIZES:
     SIZE = int(SIZE)
     mat = np.random.rand(SIZE, SIZE)
     
-    # Calculate matrix size in KB (8 bytes per double)
+    # Calculate matrix size in KB (8 bytes per double) since np.random.rand outputs float64
     matrix_size_kb = (SIZE * SIZE * 8) / 1024
     matrix_sizes_kb.append(matrix_size_kb)
     
@@ -79,5 +79,5 @@ ax2.grid(True)
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig('cache_performance.png', dpi=300, bbox_inches='tight')
+plt.savefig('q1_4.png', dpi=300, bbox_inches='tight')
 plt.close()
