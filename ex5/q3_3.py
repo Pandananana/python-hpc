@@ -10,15 +10,32 @@ def mandelbrot_escape_time(c):
             return i
     return 100
 
-def generate_mandelbrot_set(points, num_processes):
+def generate_mandelbrot_set_chunks(points, num_processes):
+    data_size = points.shape[0]
+
+    chunk_size = data_size//num_processes
+    chunks = [points[i:i + chunk_size] for i in range(0, data_size, chunk_size)]
+
     pool = multiprocessing.Pool(num_processes)
-    results_async = [pool.apply_async(mandelbrot_escape_time, (c,)) for c in points]
-    results = [r.get() for r in results_async]
+    results_async = [pool.apply_async(process_chunk, (chunk,))
+                    for chunk in chunks]
+    
+    results = []
+    for r in results_async:
+        results.extend(r.get())
     
     pool.close()
     pool.join()
 
+    
+    
     return np.array(results)
+
+def process_chunk(chunk):
+    result = []
+    for item in chunk:
+        result.append(mandelbrot_escape_time(item))
+    return result
 
 def plot_mandelbrot(escape_times):
     plt.imshow(escape_times, cmap='hot', extent=(-2, 2, -2, 2))
@@ -38,7 +55,7 @@ if __name__ == "__main__":
     points = np.array([complex(x, y) for x in x_values for y in y_values])
 
     # Compute set
-    mandelbrot_set = generate_mandelbrot_set(points, num_proc)
+    mandelbrot_set = generate_mandelbrot_set_chunks(points, num_proc)
 
     # Save set as image
     mandelbrot_set = mandelbrot_set.reshape((height, width))
