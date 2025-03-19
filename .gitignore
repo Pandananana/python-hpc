@@ -2,3 +2,4 @@ logs*
 *.bl
 *.npy
 __pycache__
+dmi.csv
